@@ -1,7 +1,7 @@
 import random
 import time
 
-
+#player character class
 class Hero:
     def __init__ (self, name, atkbonus, armcla, basedmg, dicedmg, atkdice):
         self.name = name
@@ -11,7 +11,7 @@ class Hero:
         self.dicedmg = dicedmg
         self.atkdice = atkdice
 
-
+#Enemy class 
 class Baddie:
     def __init__ (self, name, atkbonus, armcla, basedmg, dicedmg, atkdice):
         self.name = name
@@ -21,23 +21,24 @@ class Baddie:
         self.dicedmg = dicedmg
         self.atkdice = atkdice
 
-
+#different dice options
 d20dice = range(1, 20)
 d12dice = range(1, 12)
 d10dice = range(1, 10)
 d8dice = range(1, 8)
 d6dice = range(1, 6)
 
-
+#starting point
 player_name = input("Choose your characters name...\n")
 player_health = 1
 
-
+#attributes to be used against classes
 player = Hero(name=player_name, atkbonus=6, armcla=15, basedmg=10, dicedmg=2, atkdice=d12dice)
 balzog = Baddie(name="Balzog the Cruel", atkbonus=8, armcla=17, basedmg=8, dicedmg=2, atkdice=d8dice)
 draygurn = Baddie(name="Draygurn the Butcher", atkbonus=6, armcla=16, basedmg=5, dicedmg=8,atkdice=d6dice)
 wolf = Baddie(name="Dire Wolf", atkbonus=8, armcla=14, basedmg=4, dicedmg=4, atkdice=d6dice)
 baddie_choice = 0
+#choosing the opponent and designating this tot he "opponent" variable for later use
 while baddie_choice != 1 or 2 or 3:
     print("Select opponent - 1. Balzog the Cruel, 2. Dragurn the Butcher, 3. Dire Wolf\n")
     baddie_choice = int(input("Type 1, 2 or 3 to select..."))
@@ -58,7 +59,7 @@ while baddie_choice != 1 or 2 or 3:
         break
 
 
-
+#you deal damage
 def playerturn():
     global baddie_health
     global player_health
@@ -87,7 +88,7 @@ def playerturn():
         time.sleep(2)
         exit()
 
-
+#opponent does damage
 def baddieturn():
     global baddie_health
     global player_health
@@ -119,7 +120,7 @@ def baddieturn():
         time.sleep(2)
         exit()
 
-
+#rolling to see who goes first
 def initiative():
     input("Press Enter to roll...\n")
     player_roll = random.choice(d20dice)
@@ -140,7 +141,7 @@ def initiative():
         baddieturn()
 
 
-
+#starting point
 def start():
     global baddie_health
     global player_health
