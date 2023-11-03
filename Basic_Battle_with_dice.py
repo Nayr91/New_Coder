@@ -1,157 +1,173 @@
 import random
 import time
 
-#player character class
-class Hero:
-    def __init__ (self, name, atkbonus, armcla, basedmg, dicedmg, atkdice):
+# Declare classes
+class Character:
+    def __init__ (self, name, health, atkbonus, armcla, basedmg, dicedmg, atkdice):
         self.name = name
+        self.health = health
         self.atkbonus = atkbonus
         self.armcla = armcla
         self.basedmg = basedmg
         self.dicedmg = dicedmg
         self.atkdice = atkdice
+    def __repr__(self):
+      intro = "{name} has {health} health with an armour class of {armcla}".format(name = self.name, health = self.health, armcla = self.armcla)
+      return intro
 
-#Enemy class 
-class Baddie:
-    def __init__ (self, name, atkbonus, armcla, basedmg, dicedmg, atkdice):
-        self.name = name
-        self.atkbonus = atkbonus
-        self.armcla = armcla
-        self.basedmg = basedmg
-        self.dicedmg = dicedmg
-        self.atkdice = atkdice
+    def take_damage(self, damage):
+      self.health -= damage
+      return self.health
+    
+    def atk_roll(self):
+      dice_roll = random.choice(d20dice) + self.atkbonus
+      return dice_roll
 
-#different dice options
+    def deal_damage(self):
+      damage = self.basedmg + (self.dicedmg * (random.choice(self.atkdice)))
+      return damage
+    
+    def gold_value(self):
+      value = random.randint(40, self.health)
+      value = value * 3
+      return value
+
+class Warrior(Character):
+  def __init__(self, name):
+    Character.__init__(self, name, 200, 6, 14, 10, 3, d10dice)
+
+class Rogue(Character):
+  def __init__(self, name):
+    Character.__init__(self, name, 120, 8, 16, 5, 5, d6dice)
+
+class Mage(Character):
+  def __init__(self, name):
+    Character.__init__(self, name, 80, 10, 16, 10, 3, d12dice)
+
 d20dice = range(1, 20)
 d12dice = range(1, 12)
 d10dice = range(1, 10)
 d8dice = range(1, 8)
 d6dice = range(1, 6)
 
-#starting point
-player_name = input("Choose your characters name...\n")
-player_health = 1
+def enemy_choice(x):
+  if x == 1:
+    opponent = Character("Balzog the Cruel",150, 8, 17, 8, 2, d8dice)
+    print(opponent)
+    return opponent
+  elif x == 2:
+    opponent = Character("Draygurn the Butcher",120, 6, 16, 5, 8, d6dice)
+    print(opponent)
+    return opponent
+  elif x == 3:
+    opponent = Character("Dire Wolf",70, 8, 14, 4, 4, d6dice)
+    print(opponent)
+    return opponent
 
-#attributes to be used against classes
-player = Hero(name=player_name, atkbonus=6, armcla=15, basedmg=10, dicedmg=2, atkdice=d12dice)
-balzog = Baddie(name="Balzog the Cruel", atkbonus=8, armcla=17, basedmg=8, dicedmg=2, atkdice=d8dice)
-draygurn = Baddie(name="Draygurn the Butcher", atkbonus=6, armcla=16, basedmg=5, dicedmg=8,atkdice=d6dice)
-wolf = Baddie(name="Dire Wolf", atkbonus=8, armcla=14, basedmg=4, dicedmg=4, atkdice=d6dice)
-baddie_choice = 0
-#choosing the opponent and designating this tot he "opponent" variable for later use
-while baddie_choice != 1 or 2 or 3:
-    print("Select opponent - 1. Balzog the Cruel, 2. Dragurn the Butcher, 3. Dire Wolf\n")
-    baddie_choice = int(input("Type 1, 2 or 3 to select..."))
-    if baddie_choice == 1:
-        print("You have selected Balzog the Cruel")
-        opponent = balzog
-        baddie_health = 150
-        break
-    elif baddie_choice == 2:
-        print("You have selected Draygurn the Butcher")
-        opponent = draygurn
-        baddie_health = 120
-        break
-    elif baddie_choice == 3:
-        print("You have selected Dire Wolf")
-        opponent = wolf
-        baddie_health = 70
-        break
+def class_choice(x, name):
+  if x == 1:
+    player = Warrior(name)
+    print(player)
+    return player
+  elif x == 2:
+    player = Rogue(name)
+    print(player)
+    return player
+  elif x == 3:
+    player = Mage(name)
+    print(player)
+    return player
 
 
-#you deal damage
-def playerturn():
-    global baddie_health
-    global player_health
-    while player_health >= 1:
-        print("It's your go",player.name,"!")
-        time.sleep(1)
-        print("Time to attack!")
-        time.sleep(1)
-        input("Press Enter to attack...\n")
-        time.sleep(1)
-        attackroll = (random.choice(d20dice)+player.atkbonus)
-        print("You rolled",attackroll,"to strike again",opponent.name,"armour class of",opponent.armcla,"!")
-        if attackroll >= opponent.armcla:
-            damagedealt = player.basedmg + (player.dicedmg*(random.choice(d12dice)))
-            print("You deal",damagedealt,"to", opponent.name)
-            baddie_health = baddie_health-damagedealt
-            print(opponent.name, "has", baddie_health, "HP left")
-            time.sleep(1)
-            baddieturn()
-        else:
-            print("Oh no, you missed!")
-            time.sleep(1)
-            baddieturn()
-    else:
-        print("Game over, you lose!")
-        time.sleep(2)
-        exit()
-
-#opponent does damage
-def baddieturn():
-    global baddie_health
-    global player_health
-    while baddie_health >= 1:
-        print(opponent.name,"'s turn")
-        time.sleep(1)
-        print("Prepare yourself!")
-        time.sleep(1)
-        attackroll = (random.choice(d20dice)+opponent.atkbonus)
-        print(opponent.name, "rolled",attackroll,"to strike against",player.name,"armour class of",player.armcla,"!")
-        time.sleep(2)
-        if attackroll >= player.armcla:
-            damagedealt = opponent.basedmg + (opponent.dicedmg*(random.choice(d8dice)))
-            print(opponent.name, "deals",damagedealt,"damage!")
-            time.sleep(1)
-            player_health = player_health-damagedealt
-            print(player.name, "has", player_health, "HP left")
-            time.sleep(1)
-            playerturn()
-        else:
-            print("The",opponent.name,"missed!")
-            time.sleep(1)
-            playerturn()
-    else:
-        print("The",opponent.name,"is defeated! Congratulations")
-        time.sleep(2)
-        gold_won = random.randint(40,300)
-        print("The", opponent.name, "has dropped", gold_won,". You place it in your coin purse")
-        time.sleep(2)
-        exit()
-
-#rolling to see who goes first
-def initiative():
-    input("Press Enter to roll...\n")
+def start():
+  player_name = input("Choose your characters name...\n")
+  class_pick = 0
+  choices = [1, 2, 3]
+  while class_pick not in choices:
+    class_pick = int(input("Pick your class... \n 1. Warrior, 2. Rogue, 3. Mage\n"))
+  player = class_choice(class_pick, player_name)
+  b_choice = 0
+  print("Select opponent - 1. Balzog the Cruel, 2. Dragurn the Butcher, 3. Dire Wolf")
+  while b_choice not in choices:
+    b_choice = int(input("Input a number between 1, 2 and 3...\n"))
+  opponent = enemy_choice(b_choice)
+  print("Let's roll for initiative")
+  time.sleep(1)
+  input("Press Enter to roll...\n")
+  player_roll, baddie_roll = 0, 0
+  while player_roll == baddie_roll:
     player_roll = random.choice(d20dice)
     baddie_roll = random.choice(d20dice)
-    print("Player rolled", player_roll)
+    print(f"Player rolled: {player_roll}")
     time.sleep(1)
-    print(opponent.name,"rolled", baddie_roll)
+    print(f"{opponent.name} rolled {baddie_roll}")
+  if player_roll > baddie_roll:
+      print(f"{player.name} goes first...")
+      time.sleep(1)
+      return player_turn(player, opponent)
+  elif player_roll < baddie_roll:
+      print(f"{opponent.name} goes first...")
+      time.sleep(1)
+      return baddie_turn(player, opponent)
+
+
+def player_turn(player, opponent):
+  print(player, opponent)
+  if player.health >= 1:
+    print(f"It's your go {player.name}!")
     time.sleep(1)
-    if player_roll == baddie_roll:
-        start()
-    elif player_roll > baddie_roll:
-        print(player.name, "goes first...")
-        time.sleep(1)
-        playerturn()
-    elif player_roll < baddie_roll:
-        print(opponent.name, "goes first...")
-        time.sleep(1)
-        baddieturn()
+    print("Time to attack!")
+    time.sleep(1)
+    input("Press Enter to attack...\n")
+    time.sleep(1)
+    attackroll = player.atk_roll()
+    print(f"You rolled {attackroll} to strike again {opponent.name} armour class of {opponent.armcla}!")
+    if attackroll >= opponent.armcla:
+      damagedealt = player.deal_damage()
+      opponent.take_damage(damagedealt)
+      print(f"You dealt {damagedealt} to {opponent.name}")
+      print(f"{opponent.name} has {opponent.health} HP left")
+      time.sleep(1)
+      baddie_turn(player, opponent)
+    else:
+      print("Oh no, you missed!")
+      time.sleep(1)
+      baddie_turn(player, opponent)
+  else:
+      print("Game over, you lose!")
+      time.sleep(2)
+      exit()
 
 
-#starting point
-def start():
-    global baddie_health
-    global player_health
-    while player_health > 0 and baddie_health > 0:
-        print("Let's roll for initiative")
-        player_health = 150
-        time.sleep(1)
-        initiative()
+def baddie_turn(player, opponent):
+  if opponent.health >= 1:
+    print(f"{opponent.name}'s turn")
+    time.sleep(1)
+    print("Prepare yourself!")
+    time.sleep(1)
+    attackroll = opponent.atk_roll()
+    print(f"{opponent.name} rolled {attackroll} to strike against {player.name}armour class of {player.armcla}!")
+    time.sleep(2)
+    if attackroll >= player.armcla:
+      damagedealt = opponent.deal_damage()
+      player.take_damage(damagedealt)
+      print(f"{opponent.name} deals {damagedealt} damage!")
+      time.sleep(1)
+      print(f"{player.name} has {player.health} HP left")
+      time.sleep(1)
+      player_turn(player, opponent)
+    else:
+      print(f"{opponent.name} missed!")
+      time.sleep(1)
+      player_turn(player, opponent)
+  else:
+      print(f"{opponent.name} is defeated! Congratulations")
+      time.sleep(2)
+      gold_won = opponent.gold_value()
+      print(f"{opponent.name} has dropped {gold_won} You place it in your coin purse")
+      time.sleep(2)
+      exit()
 
 
-if __name__ == "__main__":
-    start()
+start()
 
